@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">MediaMultiSelector</string>
+
+    <string name="label_toolbar_title">SELECT MEDIA</string>
+    <string name="label_toolbar_title_image">SELECT IMAGE</string>
+    <string name="label_toolbar_title_video">SELECT VIDEO</string>
+
+    <string name="label_take_photo">Take Photo</string>
+    <string name="label_take_video">Take Video</string>
+
+    <string name="label_btn_ok">OK</string>
+    <string name="label_btn_cancel">Cancel</string>
+
+    <string name="label_tab_photo">Photo</string>
+    <string name="label_tab_video">Video</string>
+
+    <string name="msg_permission_request">Permission required</string>
+    <string name="msg_permission_write_storage">Storage write permission is needed to take photo or video.</string>
+    <string name="msg_permission_read_storage">Storage read permission is needed to show images and videos.</string>
+    <string name="msg_error_media_not_existing">Media error!</string>
+    <string name="msg_error_no_camera_found">No camera found.</string>
+    <string name="msg_selection_limit_reached">You\'ve already selected max allowed media to select.</string>
+</resources>

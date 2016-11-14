@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DemoMultiSelector</string>
+    <string name="label_btn_select_media">Select Media</string>
+</resources>
