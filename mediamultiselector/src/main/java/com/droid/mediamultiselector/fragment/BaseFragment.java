@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
 import android.widget.Toast;
 
 import com.MediaItemClickListener;
@@ -31,9 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.droid.mediamultiselector.activity.MediaSelectorActivity.DEFAULT_SELECTION_LIMIT;
 import static com.droid.mediamultiselector.activity.MediaSelectorActivity.EXTRAS_PREVIOUSLY_SELECTED;
-import static com.droid.mediamultiselector.activity.MediaSelectorActivity.SELECTION_MODE_SINGLE;
 
 public class BaseFragment extends Fragment implements MediaItemClickListener {
 
@@ -70,19 +67,9 @@ public class BaseFragment extends Fragment implements MediaItemClickListener {
         selectionLimit = getArguments().getInt(MediaSelectorActivity.EXTRAS_SELECTION_LIMIT);
         isShowCamera = getArguments().getBoolean(MediaSelectorActivity.EXTRAS_SHOW_CAMERA);
 
-        if (mode == SELECTION_MODE_SINGLE) {
-            selectionLimit = DEFAULT_SELECTION_LIMIT;
-        }
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (mode == MediaSelectorActivity.SELECTION_MODE_MULTI) {
-            ArrayList<Media> tmp = getArguments().getParcelableArrayList(EXTRAS_PREVIOUSLY_SELECTED);
-            if (tmp != null && tmp.size() > 0) {
-                arrPrevMediaPath = tmp;
-            }
+        ArrayList<Media> tmp = getArguments().getParcelableArrayList(EXTRAS_PREVIOUSLY_SELECTED);
+        if (tmp != null && tmp.size() > 0) {
+            arrPrevMediaPath = tmp;
         }
     }
 

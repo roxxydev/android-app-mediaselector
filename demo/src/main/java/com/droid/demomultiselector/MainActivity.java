@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         MediaSelectorActivity.startActivityForResult(this, REQUEST_CODE_MEDIA_SELECT,
                 MediaSelectorActivity.SELECTION_MODE_MULTI, 4, MediaSelectorActivity.MEDIA_TYPE_ALL,
-                true, arrayMediaPath);
+                true, true, arrayMediaPath);
     }
 
     @Override

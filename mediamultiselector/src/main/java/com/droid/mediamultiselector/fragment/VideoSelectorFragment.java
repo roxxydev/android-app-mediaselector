@@ -10,7 +10,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -173,7 +172,6 @@ public class VideoSelectorFragment extends BaseFragment {
                     if (!TextUtils.isEmpty(name)) {
                         video = new Video(path, name, dateTime);
                         videos.add(video);
-                        Log.d("LoaderManager", "LoaderManager video: " + path);
                     }
 
                 } while(data.moveToNext());

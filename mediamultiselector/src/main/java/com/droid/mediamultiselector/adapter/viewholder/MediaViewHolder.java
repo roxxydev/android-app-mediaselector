@@ -103,10 +103,11 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
             ivCheck.setVisibility(View.VISIBLE);
             vMaskSelectedBg.setVisibility(View.VISIBLE);
 
+            setCellItemViewState(isSelected);
+
             // Set check background to previously selected media items
             if (isShowSelectIndicator) {
                 ivCheck.setVisibility(View.VISIBLE);
-                setCellItemViewState(isSelected);
             } else {
                 ivCheck.setVisibility(View.GONE);
             }

@@ -39,6 +39,7 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
     public static final String EXTRAS_MEDIA_TYPE = "allowed_media";
     public static final String EXTRAS_SELECTION_LIMIT = "selection_limit";
 
+    public static final String EXTRAS_IS_SHOW_SELECTED_COUNT = "is_show_selected_count";
     public static final String EXTRAS_SHOW_CAMERA = "is_show_camera";
 
     public static final int MEDIA_TYPE_ALL = 0;
@@ -56,6 +57,7 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
     private int mediaType = MEDIA_TYPE_ALL;
     private int selectionLimit = DEFAULT_SELECTION_LIMIT;
     private boolean isShowCamera = true;
+    private boolean isShowSelectedCount = true;
 
     private ArrayList<String> arrPrevMediaPath = new ArrayList<>();
 
@@ -82,17 +84,21 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
      * @param selectionLimit Length of allowed number of media to pick.
      * @param mediaType Value can either be {@link #MEDIA_TYPE_IMAGE} or {@link #MEDIA_TYPE_VIDEO}
      * @param isShowCamera Flag if to allow user to take photo and video.
+     * @param isShowSelectedCount Flag if to show selected count label.
      * @param prevSelectedMediaPaths List of String of media path that were previously selected if any.
      */
     public static void startActivityForResult(Activity activity, int requestCode, int selectionMode,
                                               int selectionLimit, int mediaType,
-                                              boolean isShowCamera, ArrayList<String> prevSelectedMediaPaths) {
+                                              boolean isShowCamera,
+                                              boolean isShowSelectedCount,
+                                              ArrayList<String> prevSelectedMediaPaths) {
 
         Intent intent = new Intent(activity, MediaSelectorActivity.class);
         intent.putExtra(EXTRAS_MODE, selectionMode);
         intent.putExtra(EXTRAS_SELECTION_LIMIT, selectionLimit);
         intent.putExtra(EXTRAS_MEDIA_TYPE, mediaType);
         intent.putExtra(EXTRAS_SHOW_CAMERA, isShowCamera);
+        intent.putExtra(EXTRAS_IS_SHOW_SELECTED_COUNT, isShowSelectedCount);
         intent.putStringArrayListExtra(EXTRAS_PREVIOUSLY_SELECTED, prevSelectedMediaPaths);
         activity.startActivityForResult(intent, requestCode);
     }
@@ -169,15 +175,14 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
         selectionMode = getIntent().getExtras().getInt(EXTRAS_MODE, SELECTION_MODE_SINGLE);
         selectionLimit = getIntent().getExtras().getInt(EXTRAS_SELECTION_LIMIT, DEFAULT_SELECTION_LIMIT);
 
-        if (selectionMode == SELECTION_MODE_MULTI) {
-            ArrayList<String> tmp = getIntent().getExtras().getStringArrayList(EXTRAS_PREVIOUSLY_SELECTED);
-            if (tmp != null && tmp.size() > 0) {
-                arrPrevMediaPath = tmp;
-            }
+        ArrayList<String> tmp = getIntent().getStringArrayListExtra(EXTRAS_PREVIOUSLY_SELECTED);
+        if (tmp != null && tmp.size() > 0) {
+            arrPrevMediaPath = tmp;
         }
 
         mediaType = getIntent().getExtras().getInt(EXTRAS_MEDIA_TYPE, MEDIA_TYPE_ALL);
         isShowCamera = getIntent().getExtras().getBoolean(EXTRAS_SHOW_CAMERA, true);
+        isShowSelectedCount = getIntent().getExtras().getBoolean(EXTRAS_IS_SHOW_SELECTED_COUNT, true);
     }
 
     private void initView() {
@@ -196,7 +201,8 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
             tvToolbarTitle.setText(getResources().getString(R.string.label_toolbar_title_video));
         }
 
-        if (selectionMode == SELECTION_MODE_MULTI) {
+        if (selectionMode == SELECTION_MODE_MULTI
+                && isShowSelectedCount == true) {
             tvMediaCount.setVisibility(View.VISIBLE);
             updateTextMediaCount();
         }
@@ -300,13 +306,14 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
             // notify system the media has change
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(mediaFile)));
 
-            arrPrevMediaPath.add(mediaFile.getAbsolutePath());
-
             if (selectionMode == SELECTION_MODE_SINGLE) {
+                arrPrevMediaPath.add(mediaFile.getAbsolutePath());
                 Intent data = new Intent();
                 data.putStringArrayListExtra(RESULTS_SELECTED_MEDIA, arrPrevMediaPath);
                 setResult(RESULT_OK, data);
                 finish();
+            } else if (arrPrevMediaPath.size() < selectionLimit) {
+                arrPrevMediaPath.add(mediaFile.getAbsolutePath());
             }
         }
     }

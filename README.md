@@ -30,7 +30,7 @@ dependencies {
 ```
 and also the selector activity
 ```xml
-    <activity android:name="com.android.mediamultiselector.activity.MediaSelectorActivity" />
+    <activity android:name="com.droid.mediamultiselector.activity.MediaSelectorActivity" />
 ```
 
 * To show media picker
@@ -38,7 +38,7 @@ and also the selector activity
 // mediaPathsSelected is the List of String of file paths of previously selected images/videos
 MediaSelectorActivity.startActivityForResult(this, REQUEST_CODE_MEDIA_SELECT,
             MediaSelectorActivity.SELECTION_MODE_MULTI, 4, MediaSelectorActivity.MEDIA_TYPE_ALL,
-            true, mediaPathsSelected);
+            true, true, mediaPathsSelected);
 ```
 
 it will return result of List of String of selected media paths
