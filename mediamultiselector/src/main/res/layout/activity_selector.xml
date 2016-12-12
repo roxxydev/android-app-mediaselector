@@ -82,7 +82,10 @@
             android:layout_alignParentTop="true"
             android:background="?attr/colorPrimary"
             android:elevation="6dp"
-            android:minHeight="?attr/actionBarSize"/>
+            android:minHeight="?attr/actionBarSize"
+            app:tabMaxWidth="0dp"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/activity_main_viewpager"

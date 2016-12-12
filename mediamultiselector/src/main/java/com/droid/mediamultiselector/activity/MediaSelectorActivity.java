@@ -220,6 +220,7 @@ public class MediaSelectorActivity extends AppCompatActivity implements MediaSel
             tabLayout.addTab(tabLayout.newTab().setText(strTabPhoto));
             tabLayout.addTab(tabLayout.newTab().setText(strTabVideo));
             tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            tabLayout.setTabMode(TabLayout.MODE_FIXED);
 
             final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), mediaType);
             adapter.setVideoFragment(videoSelectorFragment);

@@ -20,11 +20,11 @@ import com.MediaItemClickListener;
 import com.droid.mediamultiselector.MediaSelectCallback;
 import com.droid.mediamultiselector.R;
 import com.droid.mediamultiselector.activity.MediaSelectorActivity;
+import com.droid.mediamultiselector.activity.VideoPlayerActivity;
 import com.droid.mediamultiselector.adapter.MediaAdapter;
 import com.droid.mediamultiselector.model.Media;
 import com.droid.mediamultiselector.model.Video;
 import com.droid.mediamultiselector.utils.FileUtils;
-import com.droid.mediamultiselector.view.VideoPlayerDlgFgmt;
 
 import java.io.File;
 import java.io.IOException;
@@ -192,7 +192,7 @@ public class BaseFragment extends Fragment implements MediaItemClickListener {
 
     @Override
     public void onVideoItemPlay(Media media) {
-        VideoPlayerDlgFgmt dialog = VideoPlayerDlgFgmt.newInstance((Video) media, true, false);
-        dialog.show(getChildFragmentManager(), TAG);
+        VideoPlayerActivity.startActivity(getActivity(), (Video) media, true, true,
+                getResources().getColor(R.color.colorVideoPlayerBg));
     }
 }

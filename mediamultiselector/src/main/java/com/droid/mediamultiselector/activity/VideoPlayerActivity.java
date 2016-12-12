@@ -1,22 +1,15 @@
-package com.droid.mediamultiselector.view;
+package com.droid.mediamultiselector.activity;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.graphics.drawable.ColorDrawable;
+import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
 import com.droid.mediamultiselector.R;
 import com.droid.mediamultiselector.model.Video;
@@ -45,7 +38,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
 
-public class VideoPlayerDlgFgmt extends DialogFragment {
+public class VideoPlayerActivity extends AppCompatActivity {
 
     /**
      * The local file path of the video. If video is to be streamed, then
@@ -63,60 +56,50 @@ public class VideoPlayerDlgFgmt extends DialogFragment {
     private boolean isLocalVideo;
     private boolean isShowController;
 
-    private RelativeLayout playerContainer;
+    private LinearLayout playerContainer;
     private SimpleExoPlayerView simpleExoPlayerView;
 
     private SimpleExoPlayer player;
     private Handler mainHandler;
 
-    // Required default constructor for Fragment
-    public VideoPlayerDlgFgmt() {
-
-    }
-
-    public static VideoPlayerDlgFgmt newInstance(Video video, boolean isLocalVideo,
-                                                 boolean isShowController, int bgColor) {
-        Bundle bundle = new Bundle();
-        bundle.putString(EXTRAS_VIDEO_PATH, video.path);
-        bundle.putBoolean(EXTRAS_IS_LOCAL_VIDEO, isLocalVideo);
-        bundle.putBoolean(EXTRAS_IS_SHOW_VID_CONTROLLER, isShowController);
-        bundle.putInt(EXTRAS_BG_COLOR, bgColor);
-
-        VideoPlayerDlgFgmt fgmt = new VideoPlayerDlgFgmt();
-        fgmt.setArguments(bundle);
-        return fgmt;
+    public static void startActivity(Activity activity, Video video, boolean isLocalVideo,
+                                     boolean isShowController, int bgColor) {
+        Intent intent = new Intent(activity, VideoPlayerActivity.class);
+        intent.putExtra(EXTRAS_VIDEO_PATH, video.path);
+        intent.putExtra(EXTRAS_IS_LOCAL_VIDEO, isLocalVideo);
+        intent.putExtra(EXTRAS_IS_SHOW_VID_CONTROLLER, isShowController);
+        intent.putExtra(EXTRAS_BG_COLOR, bgColor);
+        activity.startActivity(intent);
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(this.getResources().getColor(R.color.colorStatusBar));
+        }
+
+        setContentView(R.layout.activity_video_player);
 
         mainHandler = new Handler();
 
-        if (getArguments() != null) {
-            bgColor = getArguments().getInt(EXTRAS_BG_COLOR);
-            videoPath = getArguments().getString(EXTRAS_VIDEO_PATH);
-            isLocalVideo = getArguments().getBoolean(EXTRAS_IS_LOCAL_VIDEO);
-            isShowController = getArguments().getBoolean(EXTRAS_IS_SHOW_VID_CONTROLLER);
+        if (getIntent().getExtras() != null) {
+            videoPath = getIntent().getExtras().getString(EXTRAS_VIDEO_PATH);
+            isLocalVideo = getIntent().getExtras().getBoolean(EXTRAS_IS_LOCAL_VIDEO);
+            isShowController = getIntent().getExtras().getBoolean(EXTRAS_IS_SHOW_VID_CONTROLLER);
+            bgColor = getIntent().getExtras().getInt(EXTRAS_BG_COLOR);
         }
+
+        initView();
     }
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_video_dlg_fgmt, null);
-        builder.setView(view);
-
-        initView(view);
-
-        return builder.create();
-    }
-
-    private void initView(View view) {
-        playerContainer = (RelativeLayout) view.findViewById(R.id.layout_video_player_container);
-        simpleExoPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.layout_video_player_view);
+    private void initView() {
+        playerContainer = (LinearLayout) findViewById(R.id.layout_video_player_container);
+        simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.layout_video_player_view);
 
         playerContainer.setBackgroundColor(bgColor);
 
@@ -128,18 +111,18 @@ public class VideoPlayerDlgFgmt extends DialogFragment {
                 new DefaultTrackSelector(mainHandler, videoTrackSelectionFactory);
 
         // Initialize player to use with SimpleExoPlayerView
-        player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, new DefaultLoadControl());
+        player = ExoPlayerFactory.newSimpleInstance(VideoPlayerActivity.this, trackSelector, new DefaultLoadControl());
 
         // Set the player to use for SimpleExoPlayerView
         simpleExoPlayerView.setUseController(isShowController);
         simpleExoPlayerView.setPlayer(player);
 
         // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
-                Util.getUserAgent(getActivity(), "MediaMultiSelector"), bandwidthMeter);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(VideoPlayerActivity.this,
+                Util.getUserAgent(VideoPlayerActivity.this, "MediaMultiSelector"), bandwidthMeter);
 
         DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
-                Util.getUserAgent(getActivity(), "MediaMultiSelector"));
+                Util.getUserAgent(VideoPlayerActivity.this, "MediaMultiSelector"));
 
         // Produces Extractor instances for parsing the media data.
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
@@ -147,7 +130,7 @@ public class VideoPlayerDlgFgmt extends DialogFragment {
         // This is the MediaSource representing the media to be played.
         MediaSource videoSource = null;
         if (isLocalVideo) {
-             videoSource = new ExtractorMediaSource(Uri.fromFile(new File(videoPath)),
+            videoSource = new ExtractorMediaSource(Uri.fromFile(new File(videoPath)),
                     dataSourceFactory, extractorsFactory, null, null);
         } else {
             videoSource = new DashMediaSource(Uri.parse(videoPath), dataSourceFactory,
@@ -164,7 +147,7 @@ public class VideoPlayerDlgFgmt extends DialogFragment {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 if (playbackState == ExoPlayer.STATE_ENDED) {
-                    VideoPlayerDlgFgmt.this.dismiss();
+                    VideoPlayerActivity.this.finish();
                 }
             }
 
@@ -189,26 +172,12 @@ public class VideoPlayerDlgFgmt extends DialogFragment {
         player.setPlayWhenReady(true);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getDialog().getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(this.getResources().getColor(R.color.colorStatusBar));
-            window.setBackgroundDrawable(new ColorDrawable(bgColor));
-        }
-
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-
+    protected void onDestroy() {
         // Release resources taken up by ExoPlayer
         if (player != null)
             player.release();
+
+        super.onDestroy();
     }
 }

@@ -12,6 +12,9 @@
 
         <activity android:name=".activity.MediaSelectorActivity" />
 
+        <activity
+            android:name=".activity.VideoPlayerActivity"/>
+
     </application>
 
 </manifest>
